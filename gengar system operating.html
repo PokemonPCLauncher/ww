@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pokemon OS</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: url('gengar.png') no-repeat center center fixed;
+            background-size: cover;
+        }
+        .taskbar {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+        .menu {
+            display: none;
+            position: absolute;
+            top: 40px;
+            left: 10px;
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0px 0px 10px black;
+        }
+        .menu button {
+            display: block;
+            margin: 5px 0;
+        }
+        .icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100px;
+            height: 100px;
+            background: url('pokemon_icon.png') no-repeat center;
+            background-size: cover;
+            cursor: pointer;
+        }
+        .search-bar {
+            margin-left: 10px;
+        }
+        .search-bar input {
+            padding: 5px;
+            border-radius: 5px;
+            border: none;
+            outline: none;
+        }
+        .terminal {
+            display: none;
+            position: absolute;
+            top: 20%;
+            left: 50%;
+            transform: translate(-50%, -20%);
+            width: 600px;
+            height: 300px;
+            background: black;
+            color: green;
+            font-family: monospace;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0px 0px 10px rgba(0, 255, 0, 0.5);
+            overflow-y: auto;
+        }
+        .terminal input {
+            background: black;
+            color: green;
+            border: none;
+            outline: none;
+            width: 100%;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="taskbar">
+        <div onclick="toggleMenu()">☰</div>
+        <div class="search-bar">
+            <input type="text" id="search" placeholder="Wpisz PPL aby otworzyć gre" onkeypress="searchApp(event)">
+        </div>
+    </div>
+    <div class="menu" id="menu">
+        <button onclick="logout()">Wyloguj</button>
+        <button onclick="shutdown()">Wyłącz</button>
+        <button onclick="restart()">Restartuj</button>
+    </div>
+    <div class="icon" onclick="launchGame()"></div>
+    
+    <div class="terminal" id="terminal">
+        <p>Pokemon OS Terminal v1.0</p>
+        <p>Wpisz komendę:</p>
+        <input type="text" id="terminalInput" onkeypress="handleTerminalCommand(event)">
+    </div>
+    
+    <script>
+        function toggleMenu() {
+            const menu = document.getElementById('menu');
+            menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function logout() {
+            alert('Wylogowano!');
+        }
+
+        function shutdown() {
+            alert('System został wyłączony!');
+        }
+
+        function restart() {
+            alert('System uruchamia się ponownie...');
+            location.reload();
+        }
+
+        function launchGame() {
+            window.location.href = 'pokemon_pc_launcher.html';
+        }
+
+        function searchApp(event) {
+            if (event.key === 'Enter') {
+                const query = document.getElementById('search').value.toLowerCase();
+                if (query === 'ppl' || query === 'pokemon pc launcher') {
+                    document.getElementById('terminal').style.display = 'block';
+                } else {
+                    alert('Nie znaleziono aplikacji!');
+                }
+            }
+        }
+
+        function handleTerminalCommand(event) {
+            if (event.key === 'Enter') {
+                const input = document.getElementById('terminalInput');
+                const terminal = document.getElementById('terminal');
+                const command = input.value.toLowerCase();
+                let output = document.createElement('p');
+                
+                if (command === 'exit') {
+                    terminal.style.display = 'none';
+                } else if (command === 'help') {
+                    output.innerText = 'Dostępne komendy: exit, help, start PPL, wild pokemon';
+                } else if (command === 'start ppl') {
+                    output.innerText = 'Uruchamianie Pokemon PPL...';
+                } else if (command === 'wild pokemon') {
+                    let pokemons = ['Pikachu', 'Charmander', 'Bulbasaur', 'Squirtle', 'Eevee'];
+                    let wildPokemon = pokemons[Math.floor(Math.random() * pokemons.length)];
+                    output.innerText = `Na dziko pojawił się ${wildPokemon}! Czy chcesz go złapać? (yes/no)`;
+                    terminal.appendChild(output);
+                    input.value = '';
+                    input.setAttribute('data-catching', wildPokemon);
+                    return;
+                } else if (command === 'yes' || command === 'no') {
+                    let catching = input.getAttribute('data-catching');
+                    if (catching) {
+                        output.innerText = command === 'yes' ? `Złapałeś ${catching}!` : `Nie złapałeś ${catching}.`;
+                        input.removeAttribute('data-catching');
+                    } else {
+                        output.innerText = 'Nie ma Pokemona do złapania!';
+                    }
+                } else {
+                    output.innerText = 'Nieznana komenda, wpisz "help" aby dostać pomoc';
+                }
+                
+                terminal.appendChild(output);
+                input.value = '';
+            }
+        }
+    </script>
+</body>
+</html>
